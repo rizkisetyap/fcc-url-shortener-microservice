@@ -44,14 +44,16 @@ app.post('/api/shorturl', (req, res) => {
   let { url } = req.body;
   const result = url.replace(/(^\w+:|^)\/\//, '');
   try {
-    dns.lookup(result, async (err, address, family) => {
+    const URLobj = new URL(url);
+    console.log(URLobj);
+    dns.lookup(URLobj.hostname, async (err, address, family) => {
       if (err) {
         return res.json({ error: 'invalid url' });
       } else {
         const n = Math.floor(Math.random() * 100);
         const oldUrl = await Model.findOne({ short_url: n });
         if (oldUrl) {
-          oldUrl.original_url = result;
+          oldUrl.original_url = url;
           oldUrl.save((err, doc) => {
             return res.json({
               original_url: doc.original_url,
@@ -60,7 +62,7 @@ app.post('/api/shorturl', (req, res) => {
           });
         } else {
           const url_object = await Model.create({
-            original_url: result,
+            original_url: url,
             short_url: n,
           });
           return res.json({
