@@ -48,7 +48,7 @@ app.post('/api/shorturl', (req, res) => {
   try {
     const URLobj = new URL(url);
     console.log(URLobj);
-    if (URLobj.protocol !== 'http' || URLobj.protocol !== 'https') {
+    if (URLobj.protocol === 'ftp:') {
       return res.json({ error: 'invalid url' });
     }
     dns.lookup(URLobj.hostname, async (err, address, family) => {
