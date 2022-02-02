@@ -42,16 +42,16 @@ app.get('/api/hello', function (req, res) {
 
 app.post('/api/shorturl', (req, res) => {
   let { url } = req.body;
+  const result = url.replace(/(^\w+:|^)\/\//, '');
   try {
-    const originalUrl = new URL(url);
-    dns.lookup(originalUrl.hostname, async (err, address, family) => {
+    dns.lookup(result, async (err, address, family) => {
       if (err) {
-        return res.json({ error: 'Invalid Hostname' });
+        return res.json({ error: 'invalid url' });
       } else {
         const n = Math.floor(Math.random() * 100);
         const oldUrl = await Model.findOne({ short_url: n });
         if (oldUrl) {
-          oldUrl.original_url = originalUrl.hostname;
+          oldUrl.original_url = result;
           oldUrl.save((err, doc) => {
             return res.json({
               original_url: doc.original_url,
@@ -60,7 +60,7 @@ app.post('/api/shorturl', (req, res) => {
           });
         } else {
           const url_object = await Model.create({
-            original_url: originalUrl.origin,
+            original_url: result,
             short_url: n,
           });
           return res.json({
@@ -71,7 +71,7 @@ app.post('/api/shorturl', (req, res) => {
       }
     });
   } catch (error) {
-    return res.json({ error: 'Invalid URL' });
+    return res.json({ error: 'invalid url' });
   }
 });
 app.get('/api/shorturl/:short_url', async (req, res) => {
@@ -80,13 +80,13 @@ app.get('/api/shorturl/:short_url', async (req, res) => {
     const url = await Model.findOne({ short_url });
     // console.log(url);
     if (!url) {
-      return res.json({ error: 'Invalid url' });
+      return res.json({ error: 'invalid url' });
     }
     console.log(url.original_url);
     // res.json(url);
     res.redirect(url.original_url);
   } catch (error) {
-    return res.json({ error: 'Invalid url' });
+    return res.json({ error: 'invalid url' });
   }
 });
 
