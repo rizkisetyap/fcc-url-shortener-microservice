@@ -84,7 +84,7 @@ app.get('/api/shorturl/:short_url', async (req, res) => {
     }
     console.log(url.original_url);
     // res.json(url);
-    res.redirect('https://' + url.original_url);
+    res.redirect(url.original_url);
   } catch (error) {
     return res.json({ error: 'Invalid url' });
   }
