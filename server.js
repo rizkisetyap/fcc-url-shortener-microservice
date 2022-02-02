@@ -36,8 +36,9 @@ app.get('/', async function (req, res) {
 });
 
 // Your first API endpoint
-app.get('/api/hello', function (req, res) {
-  res.json({ greeting: 'hello API' });
+app.get('/api/hello', async function (req, res) {
+  const urls = await Model.find();
+  res.json({ greeting: 'hello API', urls });
 });
 
 app.post('/api/shorturl', (req, res) => {
@@ -47,6 +48,9 @@ app.post('/api/shorturl', (req, res) => {
   try {
     const URLobj = new URL(url);
     console.log(URLobj);
+    if (URLobj.protocol !== 'http' || URLobj.protocol !== 'https') {
+      return res.json({ error: 'invalid url' });
+    }
     dns.lookup(URLobj.hostname, async (err, address, family) => {
       if (err) {
         return res.json({ error: 'invalid url' });
