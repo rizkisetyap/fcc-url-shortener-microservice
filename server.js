@@ -41,6 +41,7 @@ app.get('/api/hello', function (req, res) {
 });
 
 app.post('/api/shorturl', (req, res) => {
+  console.log(req.body);
   let { url } = req.body;
   const result = url.replace(/(^\w+:|^)\/\//, '');
   try {
